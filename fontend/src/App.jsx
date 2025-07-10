@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import VerifyCode from './pages/VerifyCode';
 import TestAPI from './components/TestAPI';
 import Dashboard from './pages/Dashboard';
+import PageErr from './pages/PageErr';
 
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<PageErr />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<VerifyCode />} />
           <Route path="/dashboard" element={<Dashboard />} />

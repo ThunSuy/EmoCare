@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Logo from '../assets/logo-emo.png'
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
+import ToastErr from '../components/ToastErr';
 
 const VerifyCode = () => {
     const inputsRef = useRef([]);
     const navigate = useNavigate();
     const [code, setCode] = useState(Array(6).fill(''));
+    const [showToast, setShowToast] = useState(false);
     const apiUrl = import.meta.env.VITE_API_URL
     const email = useLocation().state?.email;
 
@@ -32,9 +34,11 @@ const VerifyCode = () => {
             localStorage.setItem('token', res.data.token);
             navigate('/dashboard');
         } catch {
-            alert('Mã không đúng');
-            console.log('Verifying code:', passcode);
-            console.log('Email:', email);
+            // alert('Mã không đúng');
+
+            setShowToast(true); // Hiện toast khi lỗi
+            setTimeout(() => setShowToast(false), 6000);             // console.log('Verifying code:', passcode);
+            // console.log('Email:', email);
         }
     };
 
@@ -62,13 +66,26 @@ const VerifyCode = () => {
         }
     };
 
-    const handleResend = () => {
+    const handleResend = async () => {
         alert('Code resent!');
-        // TODO: Gọi API gửi lại mã
+        try {
+            await axios.post(`${apiUrl}/auth/email/request`, { email });
+        } catch (error) {
+            console.error("Lỗi gửi email:", error);
+            alert("Không thể gửi mã xác thực. Vui lòng thử lại.");
+        }
     };
+
 
     return (
         <>
+            {showToast && (
+                <ToastErr
+                    title="Lỗi đăng nhập"
+                    message="Passcode không đúng."
+                    onClose={() => setShowToast(false)}
+                />
+            )}
             <div className="mx-auto  my-auto flex flex-col items-center justify-center h-screen ">
                 <div className='my-2'>
                     <img src={Logo} alt="Logo" />

@@ -14,8 +14,8 @@ const Login = () => {
 
     const handleEmailLogin = async () => {
         try {
-            await axios.post(`${apiUrl}/auth/email/request`, { email });
             navigate('/verify', { state: { email } });
+            await axios.post(`${apiUrl}/auth/email/request`, { email });
         } catch (error) {
             console.error("Lỗi gửi email:", error);
             alert("Không thể gửi mã xác thực. Vui lòng thử lại.");
