@@ -1,9 +1,42 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Logo from '../assets/logo-emo.png'
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const VerifyCode = ({ email = 'a***@g****.com' }) => {
+const VerifyCode = () => {
     const inputsRef = useRef([]);
+    const navigate = useNavigate();
     const [code, setCode] = useState(Array(6).fill(''));
+    const apiUrl = import.meta.env.VITE_API_URL
+    const email = useLocation().state?.email;
+
+    useEffect(() => {
+        if (!email) navigate('/');
+    }, [email]);
+
+    useEffect(() => {
+        const passcode = code.join('');
+        if (passcode.length === 6 && code.every(c => c !== '')) {
+            handleVerify(passcode);
+        }
+    }, [code]);
+
+
+    const handleVerify = async (passcode) => {
+        console.log("Dữ liệu gửi lên:", { email, code: passcode });
+        try {
+            const res = await axios.post(`${apiUrl}/auth/email/verify`, {
+                email,
+                code: passcode
+            });
+            localStorage.setItem('token', res.data.token);
+            navigate('/dashboard');
+        } catch {
+            alert('Mã không đúng');
+            console.log('Verifying code:', passcode);
+            console.log('Email:', email);
+        }
+    };
 
     const handleChange = (e, index) => {
         const value = e.target.value;

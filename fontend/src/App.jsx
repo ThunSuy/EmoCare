@@ -3,6 +3,7 @@ import React from "react";
 import Login from './pages/Login';
 import VerifyCode from './pages/VerifyCode';
 import TestAPI from './components/TestAPI';
+import Dashboard from './pages/Dashboard';
 
 
 function App() {
@@ -11,9 +12,10 @@ function App() {
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<TestAPI />} />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/login/verify-code" element={<VerifyCode />} />
+          <Route path="/verify" element={<VerifyCode />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </BrowserRouter>
     </>
