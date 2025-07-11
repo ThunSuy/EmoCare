@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from '../components/Header';
 
 const Dashboard = () => {
     const navigate = useNavigate();
@@ -35,24 +36,32 @@ const Dashboard = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            {user ? (
-                <>
-                    <h1 className="text-3xl font-bold mb-4">Chào, {user.name || user.email}!</h1>
-                    <p className="text-gray-600 mb-8">Bạn đã đăng nhập thành công.</p>
-                    <button
-                        className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                        onClick={handleLogout}
-                    >
-                        Đăng xuất
-                    </button>
+        <>
+            <div className='flex items-center'>
+                <Header />
+                <div className="flex flex-col items-center justify-center h-screen">
+                    {user ? (
+                        <>
+                            <h1 className="text-3xl font-bold mb-4">Chào, {user.name || user.email}!</h1>
+                            <p className="text-gray-600 mb-8">Bạn đã đăng nhập thành công.</p>
+                            <button
+                                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                                onClick={handleLogout}
+                            >
+                                Đăng xuất
+                            </button>
 
-                    
-                </>
-            ) : (
-                <p>Đang tải thông tin người dùng...</p>
-            )}
-        </div>
+
+                        </>
+                    ) : (
+                        <p>Đang tải thông tin người dùng...</p>
+                    )}
+                </div>
+
+            </div>
+
+        </>
+
     );
 };
 
