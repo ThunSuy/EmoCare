@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\SelfTalk;
 use App\Http\Resources\SelfTalkResource;
+use Illuminate\Support\Str;
 
 class SelfTalkController extends Controller
 {
@@ -38,10 +39,11 @@ Tôi đang tự trò chuyện với chính mình. Đây là tâm sự tôi vừa
 {$message}
 
 Hãy đáp lại như một lời tự nhủ dịu dàng và chân thành, không xưng “bạn” hay “mình-mình”.  
-– Tối đa 6–8 câu.  
+– Tối đa 6 câu.  
 – Chia ý rõ ràng: cách nhau ít nhất một dòng trống.  
 – Không đưa lời khuyên y tế hay phán xét.  
 – Giữ giọng điệu khích lệ, nhẹ nhàng, thực tế.
+– Tùy vào lời thoại, bối cảnh của người dùng, bạn nên xúc tích hoặc diễn dãi.Đừng lèm bèm khi không cần thiết.
 PROMPT;
 
         // Gọi Gemini
@@ -61,9 +63,12 @@ PROMPT;
         $chunks = array_filter(preg_split("/\n{2,}/", $text));
 
         $responses = [];
+        $group_id = (string) Str::uuid();
+
         foreach ($chunks as $chunk) {
             $responses[] = SelfTalk::create([
                 'user_id' => $user->id,
+                'group_id' => $group_id,
                 'message' => $message,
                 'response' => trim($chunk),
             ]);

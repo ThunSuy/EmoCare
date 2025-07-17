@@ -16,6 +16,7 @@ class SelfTalkResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'group_id' => $this->group_id,
             'message' => $this->message,
             'response' => $this->response,
             'created_at' => $this->created_at->toDateTimeString(),

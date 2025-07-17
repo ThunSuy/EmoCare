@@ -9,7 +9,7 @@ class SelfTalk extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'message', 'response'];
+    protected $fillable = ['user_id', 'group_id', 'message', 'response'];
 
     public function user()
     {

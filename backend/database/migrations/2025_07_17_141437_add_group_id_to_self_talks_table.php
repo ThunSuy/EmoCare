@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('self_talks', function (Blueprint $table) {
-            $table->uuid('group_id')->after('user_id');
+            $table->uuid('group_id')->nullable()->after('user_id');
         });
     }
 

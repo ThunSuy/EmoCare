@@ -64,11 +64,26 @@ const SelfTalk = () => {
                 const data = await res.json();
 
                 if (Array.isArray(data.data)) {
-                    const loadedMessages = data.data.flatMap(item => ([
-                        { sender: 'user', text: item.message },
-                        { sender: 'bot', text: item.response } // vẫn là 1 khối dài
-                    ]
-                    ));
+                    const grouped = data.data.reduce((acc, item) => {
+                        if (!acc[item.group_id]) acc[item.group_id] = [];
+                        acc[item.group_id].push(item);
+                        return acc;
+                    }, {});
+
+                    const loadedMessages = Object.values(grouped).flatMap(group => {
+                        const messages = [];
+
+                        group.forEach((item, index) => {
+                            if (index === 0) {
+                                messages.push({ sender: 'user', text: item.message, time: item.created_at });
+                            }
+                            messages.push({ sender: 'bot', text: item.response, time: item.created_at });
+                        });
+
+
+                        return messages;
+                    });
+
                     setMessages(loadedMessages);
                 }
             } catch (err) {
@@ -85,6 +100,15 @@ const SelfTalk = () => {
             endOfMessagesRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
+
+    const formatTime = (isoString) => {
+        if (!isoString) return '';
+        const date = new Date(isoString);
+        return date.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
 
     return (
         <div className="flex h-screen">
@@ -103,6 +127,7 @@ const SelfTalk = () => {
                         if (msg.sender === 'bot') {
                             const chunks = msg.text.split(/\n{2,}/); // tách đoạn
 
+
                             return chunks.map((chunk, i) => {
                                 const showAvatar = i === 0 && (idx === 0 || messages[idx - 1]?.sender !== 'bot');
 
@@ -113,20 +138,28 @@ const SelfTalk = () => {
                                         ) : (
                                             <div className="w-8 mr-2" />
                                         )}
-                                        <div className="px-4 py-2 rounded-lg max-w-2xl bg-gray-200 text-gray-800">
+                                        <div className="relative px-4  pt-2 pb-8 rounded-lg max-w-2xl bg-gray-200 text-gray-800">
                                             {chunk}
+                                            <div className="text-xs text-gray-500 absolute bottom-2 right-4">
+                                                {formatTime(msg.time)}
+                                            </div>
                                         </div>
                                     </div>
+
                                 );
                             });
                         }
 
                         return (
                             <div key={idx} className="flex justify-end items-end">
-                                <div className="px-4 py-2 rounded-lg max-w-2xl bg-blue-500 text-white">
+                                <div className="relative px-4 pt-2 pb-8 rounded-lg max-w-2xl bg-blue-500 text-white">
                                     {msg.text}
+                                    <div className="text-xs text-white absolute bottom-2 right-4">
+                                        {formatTime(msg.time)}
+                                    </div>
                                 </div>
                             </div>
+
                         );
                     })}
 
