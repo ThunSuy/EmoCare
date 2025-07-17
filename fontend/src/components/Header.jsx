@@ -1,11 +1,27 @@
 import React, { useState } from 'react'
 import Logo from '@/assets/logo-emo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Header = () => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-
     const toggleMenu = () => setIsOpen(!isOpen);
+    const location = useLocation();
+
+    const menuItems = [
+        { text: 'Home', route: '/dashboard' },
+        { text: 'Self Talk', route: '/selftalk' },
+        { text: 'Mind Bloom', route: '/mindbloom' },
+        { text: 'Worry Vault', route: '/worryvault' },
+        { text: 'Healing Notes', route: '/healingnotes' },
+    ];
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/login');
+    };
 
     return (
         <>
@@ -25,33 +41,36 @@ const Header = () => {
                 </button>
             </div>
 
-            <aside
-                className={`fixed font-mono top-0 left-0 z-40 h-screen w-96 bg-bg-header p-4 shadow-md transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}
-            >
+            <aside className={`fixed font-mono top-0 left-0 z-40 h-screen w-96 bg-bg-header p-4 shadow-md transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 md:static md:block`}>
                 <nav className="flex flex-col justify-between items-center h-full">
-                    {/* Logo  */}
                     <div className='w-40 mt-16'>
                         <img src={Logo} alt="Logo" />
                     </div>
 
-                    {/* Links  */}
-                    <ul className="text-xl text-text-nav-header font-bold space-y-5 flex flex-col items-center ">
-                        {["Home", "Self Talk", "Mind Bloom", "Worry Vault", "Healing Notes"].map((text, index) => (
-                            <li key={index}>
-                                <a
-                                    href="#"
-                                    className="relative group inline-block text-current hover:text-black transition duration-300 focus:text-black"
-                                >
-                                    {text}
-                                    <span
-                                        className="absolute left-1/2 -bottom-1 h-[2px] w-0 bg-current transition-all duration-300 ease-in-out group-hover:w-full group-focus:w-full transform -translate-x-1/2"
-                                    ></span>
-                                </a>
-                            </li>
-                        ))}
+                    <ul className="text-xl font-bold space-y-5 flex flex-col items-center">
+                        {menuItems.map((item, index) => {
+                            const isActive = location.pathname === item.route;
+                            return (
+                                <li key={index}>
+                                    <button
+                                        onClick={() => navigate(item.route)}
+                                        className={`relative group inline-block transition duration-300 ${isActive
+                                            ? 'text-black underline underline-offset-4'
+                                            : 'text-text-nav-header hover:text-black'
+                                            }`}
+                                    >
+                                        {item.text}
+                                        <span
+                                            className="absolute left-1/2 -bottom-1 h-[2px] w-0 bg-current transition-all duration-300 ease-in-out group-hover:w-full  transform -translate-x-1/2"
+                                        ></span>
+                                    </button>
+
+                                </li>
+                            );
+                        })}
                     </ul>
 
-                    <div className="mx-10 mt-10 text-xs">
+                    <div className="mx-10 mt-10 text-xs text-text">
                         <p className='text-center'>
                             Đây là sản phẩm phi lợi nhuận nhằm mục đích đồng hành cùng bạn trong những ngày khó khăn.<br /> Nếu bạn cần tâm sự, hãy liên hệ với tôi, tôi sẽ lắng nghe câu chuyện của bạn.
                         </p>
@@ -72,8 +91,8 @@ const Header = () => {
 
                     {/* Logout  */}
                     <div>
-                        <button className='text-xl font-extrabold flex align-items-center mb-10'>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6 mt-0.5 mr-1.5">
+                        <button className='text-xl text-text font-extrabold flex align-items-center mb-10' onClick={handleLogout}>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 mt-0.5 mr-1.5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
                             </svg>
 

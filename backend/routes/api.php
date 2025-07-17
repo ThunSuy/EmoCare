@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SelfTalkController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +32,12 @@ Route::post('/auth/google', [AuthController::class, 'loginWithGoogle']);
 Route::post('/auth/email/request', [AuthController::class, 'sendLoginCode']);
 // Verify login code
 Route::post('/auth/email/verify', [AuthController::class, 'verifyLoginCode']);
+
+// Request Generate Text API
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/self-talks', [SelfTalkController::class, 'store']);
+});
+
+// 
+Route::middleware('auth:sanctum')->get('/self-talks', [SelfTalkController::class, 'index']);
+
