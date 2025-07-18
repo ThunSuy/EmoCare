@@ -13,7 +13,8 @@ const SelfTalk = () => {
     const handleSend = async () => {
         if (!input.trim()) return;
 
-        const userMessage = { sender: 'user', text: input };
+        const now = new Date().toISOString(); // thời gian hiện tại ISO để dễ xử lý
+        const userMessage = { sender: 'user', text: input, time: now };
         setMessages(prev => [...prev, userMessage]);
         setInput('');
         setIsTyping(true);
@@ -32,8 +33,8 @@ const SelfTalk = () => {
 
             // ✅ Xử lý mảng nhiều phản hồi
             const botMessages = Array.isArray(data.data)
-                ? data.data.map(item => ({ sender: 'bot', text: item.response }))
-                : [{ sender: 'bot', text: data.data?.response || 'Cảm ơn vì đã chia sẻ.' }];
+                ? data.data.map(item => ({ sender: 'bot', text: item.response, time: new Date().toISOString() }))
+                : [{ sender: 'bot', text: data.data?.response, time: new Date().toISOString() || 'Cảm ơn vì đã chia sẻ.' }];
 
             // Gửi từng đoạn với delay
             for (const msg of botMessages) {
