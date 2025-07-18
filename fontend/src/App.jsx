@@ -6,6 +6,7 @@ import TestAPI from './components/TestAPI';
 import Dashboard from './pages/Dashboard';
 import PageErr from './pages/PageErr';
 import SelfTalk from './pages/SelfTalk';
+import MindBloom from './pages/MindBloom';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/verify" element={<VerifyCode />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/selftalk" element={<SelfTalk />} />
+          <Route path="/mindbloom" element={<MindBloom />} />
         </Routes>
       </BrowserRouter>
     </>
