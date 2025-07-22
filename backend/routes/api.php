@@ -16,10 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 // Test API route
 Route::get('/ping', function () {
     return response()->json(['message' => 'Pong! React đã gọi được API Laravel rồi 😎']);
@@ -33,11 +29,17 @@ Route::post('/auth/email/request', [AuthController::class, 'sendLoginCode']);
 // Verify login code
 Route::post('/auth/email/verify', [AuthController::class, 'verifyLoginCode']);
 
-// Request Generate Text API
+Route::get('/login', function () {
+    return response()->json(['message' => 'Vui lòng đăng nhập'], 401);
+})->name('login');
+
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::get('/self-talks', [SelfTalkController::class, 'index']);
     Route::post('/self-talks', [SelfTalkController::class, 'store']);
 });
-
-// 
-Route::middleware('auth:sanctum')->get('/self-talks', [SelfTalkController::class, 'index']);
-

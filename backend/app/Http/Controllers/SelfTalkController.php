@@ -6,17 +6,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\SelfTalk;
 use App\Http\Resources\SelfTalkResource;
+use App\Repositories\SelfTalkRepositoryInterface;
 use Illuminate\Support\Str;
 
 class SelfTalkController extends Controller
 {
 
+    protected $selfTalkRepo;
+
+
+    public function __construct(SelfTalkRepositoryInterface $selfTalkRepo)
+    {
+        $this->selfTalkRepo = $selfTalkRepo;
+    }
+
+
     public function index(Request $request)
     {
         $user = $request->user();
-        $talks = SelfTalk::where('user_id', $user->id)
-            ->orderBy('created_at', 'asc') // quan trọng để đúng thứ tự
-            ->get();
+        // $talks = SelfTalk::where('user_id', $user->id)
+        //     ->orderBy('created_at', 'asc')
+        //     ->get();
+
+        $talks = $this->selfTalkRepo->getAllByUser($user->id);
 
         return SelfTalkResource::collection($talks);
     }

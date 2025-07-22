@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Logo from '@/assets/logo-emo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -18,9 +19,28 @@ const Header = () => {
     ];
 
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/login');
+    const handleLogout = async () => {
+        // localStorage.removeItem('token');
+        // navigate('/login');
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+
+            // if (res.ok) {
+            //     localStorage.removeItem('token');
+            //     navigate('/login');
+            // } else {
+            //     console.error('Logout failed:', await res.text());
+            // }
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+
     };
 
     return (

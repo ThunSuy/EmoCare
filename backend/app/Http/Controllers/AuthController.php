@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\PasscodeMail;
 use App\Models\EmailVerification;
 use App\Models\User;
+use App\Repositories\AuthRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -13,24 +14,21 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    protected $authRepo;
+
+    public function __construct(AuthRepositoryInterface $authRepo)
+    {
+        $this->authRepo = $authRepo;
+    }
+
     // Login with google
     public function loginWithGoogle(Request $request)
     {
         $googleToken = $request->input('token');
-
         $googleUser = Socialite::driver('google')->stateless()->userFromToken($googleToken);
-
-        $user = User::updateOrCreate(
-            ['email' => $googleUser->getEmail()],
-            ['name' => $googleUser->getName()]
-        );
-
+        $user = $this->authRepo->findOrCreateUserByGoogle($googleUser);
         $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token
-        ]);
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
 
@@ -38,16 +36,8 @@ class AuthController extends Controller
     public function sendLoginCode(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-
         $code = rand(100000, 999999);
-
-        EmailVerification::updateOrCreate(
-            ['email' => $request->email],
-            ['code' => $code, 'created_at' => now()]
-        );
-
-        Mail::to($request->email)->send(new PasscodeMail($code));
-
+        $this->authRepo->sendLoginCode($request->email, $code);
         return response()->json(['message' => 'Code sent']);
     }
 
@@ -57,32 +47,22 @@ class AuthController extends Controller
             'email' => 'required|email',
             'code' => 'required|digits:6',
         ]);
-
-        // Log::info('Verify request', $request->only('email', 'code'));
-
-        $verification = EmailVerification::where('email', $request->email)
-            ->where('code', $request->code)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->first();
-
+        $verification = $this->authRepo->verifyLoginCode($request->email, $request->code);
         if (!$verification) {
             return response()->json(['message' => 'Invalid or expired code'], 401);
         }
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            $user = User::create([
-                'email' => $request->email,
-                'name' => 'User_' . Str::random(5)
-            ]);
-        }
-
-
+        $user = User::firstOrCreate(
+            ['email' => $request->email],
+            ['name' => 'User_' . Str::random(5)]
+        );
         $verification->delete();
-
         $token = $user->createToken('auth_token')->plainTextToken;
-
         return response()->json(['token' => $token]);
+    }
+
+    public function logout(Request $request)
+    {
+        $this->authRepo->logout($request->user());
+        return response()->json(['message' => 'Logged out']);
     }
 }
